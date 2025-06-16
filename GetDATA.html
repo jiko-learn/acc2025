@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentation Schedule</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .filters {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #ecf0f1;
+            border-radius: 6px;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .filter-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #34495e;
+        }
+        .filter-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        #results-container {
+            margin-top: 20px;
+        }
+        #loader {
+            text-align: center;
+            font-size: 18px;
+            color: #7f8c8d;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #e0f7fa;
+        }
+        .no-results {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #95a5a6;
+        }
+        a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Presentation Schedule & Files</h1>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="date-filter">Filter by Presentation Date:</label>
+                <select id="date-filter">
+                    <option value="all">All Dates</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="section-filter">Filter by Meeting Section:</label>
+                <select id="section-filter">
+                    <option value="all">All Sections</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="loader">Loading data from Google Sheet...</div>
+        
+        <div id="results-container">
+            <table id="results-table" style="display:none;">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email Address</th>
+                        <th>Presentation Files</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+            <p id="no-results-message" class="no-results" style="display:none;">No presentations match the selected criteria.</p>
+        </div>
+
+    </div>
+
+    <script>
+        // !!! IMPORTANT !!!
+        // PASTE YOUR "PUBLISHED TO WEB" CSV URL HERE
+        const googleSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSAdKIDw0SlNenTX6xFDEZw0RSrSQIDlVWAj_Tw4YT9WLUgiAFylR3Mq5bgFBjJRnS0xokGlWonvH2r/pub?gid=520623665&single=true&output=csv';
+
+        // Column names from your Google Sheet that we need to find
+        const DATE_COLUMN = 'The Date of Your Presentation';
+        const SECTION_COLUMN = 'Meeting Section';
+        const NAME_COLUMN = 'Your Name';
+        const EMAIL_COLUMN = 'Email Address';
+        const URL_COLUMN = 'Presentation Files Urls';
+        
+        let allData = []; // To store the parsed data from the sheet
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchData();
+            document.getElementById('date-filter').addEventListener('change', renderData);
+            document.getElementById('section-filter').addEventListener('change', renderData);
+        });
+
+        async function fetchData() {
+            const loader = document.getElementById('loader');
+            try {
+                const response = await fetch(googleSheetUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const csvText = await response.text();
+                allData = parseCSV(csvText);
+                
+                populateFilters();
+                renderData();
+                
+                loader.style.display = 'none';
+                document.getElementById('results-table').style.display = 'table';
+
+            } catch (error) {
+                loader.textContent = 'Error: Failed to load data. Please check the URL and make sure the sheet is published correctly.';
+                console.error('Fetch error:', error);
+            }
+        }
+
+        function parseCSV(text) {
+            const rows = text.split(/\r?\n/).map(row => row.split(','));
+            const header = rows[0];
+            
+            // Find the index of each required column dynamically
+            const colIndices = {
+                date: header.indexOf(DATE_COLUMN),
+                section: header.indexOf(SECTION_COLUMN),
+                name: header.indexOf(NAME_COLUMN),
+                email: header.indexOf(EMAIL_COLUMN),
+                url: header.indexOf(URL_COLUMN)
+            };
+
+            // Check if all required columns were found
+            for(const key in colIndices) {
+                if (colIndices[key] === -1) {
+                    console.error(`Error: Column "${eval(key.toUpperCase() + '_COLUMN')}" not found in the sheet.`);
+                    document.getElementById('loader').textContent = `Error: A required column was not found. Please check your sheet for "${eval(key.toUpperCase() + '_COLUMN')}".`;
+                    return [];
+                }
+            }
+            
+            // Convert rows to objects, skipping the header row
+            return rows.slice(1).map(row => {
+                if(row.length >= header.length) { // Ensure row is not malformed
+                    return {
+                        date: row[colIndices.date],
+                        section: row[colIndices.section],
+                        name: row[colIndices.name],
+                        email: row[colIndices.email],
+                        url: row[colIndices.url]
+                    };
+                }
+                return null;
+            }).filter(Boolean); // Filter out any null (malformed) rows
+        }
+
+        function populateFilters() {
+            const dateFilter = document.getElementById('date-filter');
+            const sectionFilter = document.getElementById('section-filter');
+
+            const uniqueDates = [...new Set(allData.map(item => item.date))].sort();
+            const uniqueSections = [...new Set(allData.map(item => item.section))].sort();
+
+            uniqueDates.forEach(date => {
+                if (date) { // Avoid adding blank options
+                    const option = document.createElement('option');
+                    option.value = date;
+                    option.textContent = date;
+                    dateFilter.appendChild(option);
+                }
+            });
+
+            uniqueSections.forEach(section => {
+                if (section) {
+                    const option = document.createElement('option');
+                    option.value = section;
+                    option.textContent = section;
+                    sectionFilter.appendChild(option);
+                }
+            });
+        }
+
+        function renderData() {
+            const selectedDate = document.getElementById('date-filter').value;
+            const selectedSection = document.getElementById('section-filter').value;
+            const tableBody = document.getElementById('table-body');
+            const noResultsMessage = document.getElementById('no-results-message');
+
+            tableBody.innerHTML = ''; // Clear previous results
+
+            const filteredData = allData.filter(item => {
+                const dateMatch = (selectedDate === 'all' || item.date === selectedDate);
+                const sectionMatch = (selectedSection === 'all' || item.section === selectedSection);
+                return dateMatch && sectionMatch;
+            });
+
+            if (filteredData.length === 0) {
+                noResultsMessage.style.display = 'block';
+            } else {
+                noResultsMessage.style.display = 'none';
+            }
+
+            filteredData.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.email}</td>
+                    <td><a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.url ? 'View Files' : 'No URL Provided'}</a></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+    </script>
+
+</body>
+</html>

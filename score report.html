@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Info</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <style>
+      body {
+        font-family: "Sarabun", Arial, sans-serif;
+        background-color: #f5f7fa;
+        color: #2d3748;
+        margin: 0;
+        padding: 0;
+      }
+
+      header {
+        background: #764ba2;
+        color: white;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 2rem;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 500;
+        color: #123aec;
+      }
+
+      main {
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      #loginForm {
+        max-width: 800px;
+        margin: 1rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #4a5568;
+        font-weight: 500;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-family: inherit;
+      }
+
+      button {
+        width: 100%;
+        padding: 0.75rem;
+        background: #764ba2;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+      }
+
+      .error-message {
+        color: #e53e3e;
+        margin-top: 1rem;
+        text-align: center;
+      }
+
+      #studentData {
+        display: none;
+      }
+
+      .student-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+      }
+
+      .student-card:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 12px 25px rgba(102, 126, 234, 0.2);
+      }
+
+      .student-card h3 {
+        margin: 0 0 1rem 0;
+        color: #be0aff;
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+
+      .student-card p {
+        margin: 0.5rem 0;
+        color: #4a5568;
+        font-weight: 400;
+      }
+
+      .logout-btn {
+        margin-top: 1rem;
+        background: #e2e8f0;
+        color: #4a5568;
+      }
+
+      .logout-btn:hover {
+        background: #cbd5e0;
+      }
+    </style>
+    <header>
+      <h1>คะแนนเก็บ</h1>
+    </header>
+    <main>
+      <!-- Passcode field uses type="password" to hide keypress during typing -->
+      <div id="loginForm">
+        <div class="form-group">
+          <label for="studentEmail">Email:</label>
+          <input type="email" id="studentEmail" required />
+        </div>
+        <div class="form-group">
+          <label for="studentCode">Passcode:</label>
+          <input type="password" id="studentCode" required />
+        </div>
+        <button onclick="login()">Login</button>
+        <div id="errorMessage" class="error-message"></div>
+        <div style="text-align: center"><pre>กรอกอีเมลล์และพาสโค๊ด</pre></div>
+      </div>
+      <div id="studentData"></div>
+    </main>
+    <script>
+      // ลิงค์สำหรับดึงข้อมูลจาก "Google Sheets ตามด้วย /export?format=csv"
+      const sheetURL =
+        "https://docs.google.com/spreadsheets/d/15QAnhhTdaPQIbzO7MwBjnMl_3SDnzYLp0It4k2gkzBs/export?format=csv";
+
+      function parseCSV(csvText) {
+        const lines = csvText.trim().split("\n");
+        const headers = lines[0].split(",").map((header) => header.trim());
+        const students = [];
+
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(",").map((value) => value.trim());
+          if (values.length === headers.length) {
+            const student = {};
+            for (let j = 0; j < headers.length; j++) {
+              student[headers[j]] = values[j];
+            }
+            students.push(student);
+          }
+        }
+        return students;
+      }
+
+      async function fetchSheetData() {
+        try {
+          const response = await fetch(sheetURL);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const csvText = await response.text();
+          return parseCSV(csvText);
+        } catch (error) {
+          console.error("Failed to fetch or parse data:", error);
+          throw error;
+        }
+      }
+
+      function displayStudentData(student) {
+        const studentData = document.getElementById("studentData");
+        studentData.style.display = "block";
+
+        const studentCard = document.createElement("div");
+        studentCard.className = "student-card";
+        // แสดงข้อมูลต่างๆจาก Google Sheet โดยต้องมีชื่อคลอลัมน์ตรงกับชื่อใน student["Name และอื่นๆ"]
+        studentCard.innerHTML = `
+          <h2>${student["Name"]} &emsp;&nbsp; รหัสนิสิต: ${student["Code"]}  </h2>
+          <h3>Email: ${student["Email"]} &emsp;&nbsp; หมู่: ${student["Sec"]}</h3>
+          <p>เข้าเรียน: ${student["Att"]} &emsp;&nbsp; ความปลอดภัย: ${student["Tech"]}</p>
+          <p>Quiz: ${student["Quiz"]}  &emsp13;&nbsp; รายงาน: ${student["Report"]}</p>
+          <p><strong>${student["Noted"]}</strong></p>
+
+          <button onclick="logout()" class="logout-btn">Logout</button>
+        `;
+        studentData.innerHTML = "";
+        studentData.appendChild(studentCard);
+      }
+
+      function logout() {
+        document.getElementById("loginForm").style.display = "block";
+        document.getElementById("studentData").style.display = "none";
+        document.getElementById("studentCode").value = "";
+        document.getElementById("errorMessage").textContent = "";
+      }
+
+      async function login() {
+        const studentEmail = document.getElementById("studentEmail").value;
+        const studentCode = document.getElementById("studentCode").value;
+        const errorMessage = document.getElementById("errorMessage");
+
+        if (!studentCode || !studentEmail) {
+          errorMessage.textContent = "Please enter both Email and Passcode";
+          return;
+        }
+
+        try {
+          const students = await fetchSheetData();
+          const student = students.find(
+            (s) => s.Code === studentCode && s.Email === studentEmail
+          );
+          // In google sheet, it must have columes named Code and Email (Case sensitive)
+
+          if (student) {
+            document.getElementById("loginForm").style.display = "none";
+            displayStudentData(student);
+            errorMessage.textContent = "";
+          } else {
+            errorMessage.textContent = "Invalid Email or Passcode";
+          }
+        } catch (error) {
+          errorMessage.textContent =
+            "Failed to verify credentials. Please try again.";
+        }
+      }
+
+      // Add Enter key support for login
+      document
+        .getElementById("studentCode")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            document.getElementById("studentEmail").focus();
+          }
+        });
+
+      document
+        .getElementById("studentEmail")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") login();
+        });
+    </script>
+  </body>
+</html>
