@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACC 2025 - 44th ASEAN Cardiovascular Congress</title>
+    <style>
+        /* --- General Styling --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@400;500&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f8f9fa;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: #003366; /* Deep Blue */
+        }
+
+        /* --- Header & Navigation --- */
+        header {
+            background: #ffffff;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #003366;
+        }
+
+        .logo span {
+            color: #007bff; /* Bright Blue */
+        }
+
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            margin-left: 25px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #007bff;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            background-image: linear-gradient(rgba(0, 51, 102, 0.8), rgba(0, 51, 102, 0.8)), url('https://images.unsplash.com/photo-1596591603953-6490a5621454?q=80&w=2070'); /* Placeholder image of Bangkok skyline */
+            background-size: cover;
+            background-position: center;
+            color: #ffffff;
+            text-align: center;
+            padding: 100px 20px;
+        }
+
+        .hero h1 {
+            font-size: 3em;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .hero .theme {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #ffd700; /* Gold accent */
+            margin-bottom: 30px;
+        }
+
+        .hero-details {
+            font-size: 1.2em;
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            transition: background-color 0.3s, transform 0.2s;
+            display: inline-block;
+            margin: 5px;
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid #ffffff;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        .btn-secondary:hover {
+            background-color: #ffffff;
+            color: #003366;
+        }
+
+        /* --- Content Sections --- */
+        section {
+            padding: 60px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 40px;
+        }
+        
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: #007bff;
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+
+        /* Details Grid */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            text-align: center;
+        }
+
+        .detail-card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+        
+        .detail-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .detail-card h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+
+        /* Program & Audience Lists */
+        .list-container {
+             display: flex;
+             justify-content: space-around;
+             flex-wrap: wrap;
+             gap: 20px;
+        }
+
+        .list-box {
+            background: #ffffff;
+            padding: 20px;
+            border-left: 5px solid #007bff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            width: 45%;
+            min-width: 300px;
+        }
+        
+        .list-box ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .list-box li {
+            padding: 8px 0;
+            border-bottom: 1px dashed #e0e0e0;
+        }
+        .list-box li:before {
+            content: "✓";
+            color: #007bff;
+            margin-right: 10px;
+        }
+
+        /* --- Call to Action Section --- */
+        .cta-section {
+            background-color: #003366;
+            color: #ffffff;
+            text-align: center;
+        }
+        
+        .cta-section h2 {
+            color: #ffffff;
+        }
+
+        .cta-section .deadline {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .cta-section .deadline span {
+            color: #ffd700;
+            font-weight: 700;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: #333;
+            color: #ffffff;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        footer a {
+            color: #ffd700;
+            text-decoration: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">ACC<span>2025</span></div>
+            <div class="nav-links">
+                <a href="#about">About</a>
+                <a href="#program">Program</a>
+                <a href="#register">Register</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>44th ASEAN Cardiovascular Congress</h1>
+            <p class="theme">"Reimagining ASEAN Cardiology: A Vision for the Future"</p>
+            <div class="hero-details">
+                <p><strong>October 23 - 26, 2025</strong></p>
+                <p>Centara Grand & Bangkok Convention Centre | Bangkok, Thailand</p>
+            </div>
+            <a href="#register" class="btn">Register Now</a>
+            <a href="#register" class="btn btn-secondary">Submit Abstract</a>
+        </section>
+
+        <!-- About Section -->
+        <section id="about">
+            <div class="container">
+                <h2 class="section-title">Welcome to ACC 2025</h2>
+                <div class="details-grid">
+                    <div class="detail-card">
+                        <h3>Our Vision</h3>
+                        <p>ACC 2025 is a major international conference aimed at fostering collaboration and sharing cutting-edge research to shape the future of cardiovascular medicine in the ASEAN region and beyond.</p>
+                    </div>
+                    <div class="detail-card">
+                        <h3>The Theme</h3>
+                        <p>Our theme, "Reimagining ASEAN Cardiology," focuses on innovative technologies, future trends, and addressing the unique cardiovascular health challenges of Southeast Asia.</p>
+                    </div>
+                    <div class="detail-card">
+                        <h3>Networking</h3>
+                        <p>Connect with leading cardiologists, surgeons, researchers, and healthcare professionals from around the world in the vibrant city of Bangkok.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Program & Audience Section -->
+        <section id="program" style="background-color: #ffffff;">
+            <div class="container">
+                <h2 class="section-title">Program & Audience</h2>
+                <div class="list-container">
+                    <div class="list-box">
+                        <h3>Scientific Program Highlights</h3>
+                        <ul>
+                            <li>Plenary lectures from world-renowned experts</li>
+                            <li>In-depth symposia and practical workshops</li>
+                            <li>Oral and poster presentations of new research</li>
+                            <li>Discussions on clinical best practices</li>
+                            <li>Sessions on new cardiovascular guidelines</li>
+                        </ul>
+                    </div>
+                    <div class="list-box">
+                        <h3>Who Should Attend?</h3>
+                        <ul>
+                            <li>Cardiologists (Adult & Pediatric)</li>
+                            <li>Cardiac and Vascular Surgeons</li>
+                            <li>General Physicians & Practitioners</li>
+                            <li>Researchers and Medical Scientists</li>
+                            <li>Nurses & Allied Health Professionals</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action & Registration Section -->
+        <section id="register" class="cta-section">
+            <div class="container">
+                <h2 class="section-title">Join Us in Bangkok</h2>
+                <p class="deadline">
+                    Call for Abstracts is Open! Submission Deadline: <span>May 31, 2025</span>
+                </p>
+                <p>Register early to benefit from reduced fees and secure your spot at the premier cardiology event in ASEAN.</p>
+                <br>
+                <a href="#" class="btn">Register Today</a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>Hosted by <strong>The Heart Association of Thailand</strong></p>
+            <p>In collaboration with the <strong>ASEAN Federation of Cardiology (AFC)</strong></p>
+            <p>© 2025 ASEAN Cardiovascular Congress. All Rights Reserved.</p>
+            <p>For more information, visit the official site: <a href="https://acc2025thailand.com" target="_blank">acc2025thailand.com</a></p>
+        </div>
+    </footer>
+
+</body>
+</html>
