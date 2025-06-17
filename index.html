@@ -1,379 +1,601 @@
 <!DOCTYPE html>
 <html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ACC2025 Staff Interactive Guide</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
     <!-- Chosen Palette: Calm Harmony (Light Beige background, Dark Slate text, Muted Teal accent) -->
     <!-- Application Structure Plan: A task-oriented SPA for event staff. A sticky top navigation provides immediate access to key sections: 'Home', 'My Tasks' (interactive checklists), 'Event Map' (interactive floor plans), and 'Session Codes' (filterable reference). This structure prioritizes speed and ease of use for staff in a live event environment, moving beyond the linear format of the source document to a functional tool. -->
     <!-- Visualization & Content Choices: Event Overview -> Goal: Inform -> Presentation: Styled text cards -> Interaction: None. Staff Tasks -> Goal: Instruct -> Presentation: Tabbed checklists -> Interaction: JS-powered tabs for Before/During/After states. Floor Plan -> Goal: Spatial Info -> Presentation: HTML/Tailwind Grid layout -> Interaction: JS-powered buttons to switch between floors. Session Codes -> Goal: Reference -> Presentation: HTML Table -> Interaction: JS-powered live search filter. Key Contacts -> Goal: Inform -> Presentation: Styled text cards -> Interaction: None. This approach uses interactive HTML elements to make information retrieval fast and efficient. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
-        body {
-            font-family: 'Sarabun', sans-serif;
-            background-color: #FDFBF5;
-            color: #334155;
-        }
-        .nav-link {
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        .nav-link.active {
-            color: #0d9488;
-            border-bottom: 2px solid #0d9488;
-            font-weight: 700;
-        }
-        .task-tab.active {
-            background-color: #0d9488;
-            color: white;
-        }
-        .task-tab {
-            transition: all 0.3s ease;
-        }
-        .content-section {
-            display: none;
-        }
-        .content-section.active {
-            display: block;
-        }
-        .floor-map {
-            display: none;
-        }
-        .floor-map.active {
-            display: grid;
-        }
-        .map-button.active {
-            background-color: #14b8a6;
-            color: white;
-            border-color: #0d9488;
-        }
-        .room-block {
-            border: 1px solid #cbd5e1;
-            background-color: #f8fafc;
-            padding: 0.75rem;
-            text-align: center;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-        }
+      body {
+        font-family: "Sarabun", sans-serif;
+        background-color: #fdfbf5;
+        color: #334155;
+      }
+      .nav-link {
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+      .nav-link.active {
+        color: #0d9488;
+        border-bottom: 2px solid #0d9488;
+        font-weight: 700;
+      }
+      .task-tab.active {
+        background-color: #0d9488;
+        color: white;
+      }
+      .task-tab {
+        transition: all 0.3s ease;
+      }
+      .content-section {
+        display: none;
+      }
+      .content-section.active {
+        display: block;
+      }
+      .floor-map {
+        display: none;
+      }
+      .floor-map.active {
+        display: grid;
+      }
+      .map-button.active {
+        background-color: #14b8a6;
+        color: white;
+        border-color: #0d9488;
+      }
+      .room-block {
+        border: 1px solid #cbd5e1;
+        background-color: #f8fafc;
+        padding: 0.75rem;
+        text-align: center;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+      }
     </style>
-</head>
-<body class="antialiased">
-
+  </head>
+  <body class="antialiased">
     <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
-        <nav class="container mx-auto px-4">
-            <div class="flex items-center justify-between h-16">
-                <div class="text-xl font-bold text-teal-700">ACC2025 Staff Guide</div>
-                <div class="hidden md:flex items-center space-x-8">
-                    <a class="nav-link active" data-target="home">ภาพรวม</a>
-                    <a class="nav-link" data-target="tasks">หน้าที่รับผิดชอบ</a>
-                    <a class="nav-link" data-target="map">แผนผังงาน</a>
-                    <a class="nav-link" data-target="sessions">รหัสเซสชัน</a>
-                    <a class="nav-link" data-target="contacts">รายชื่อผู้ติดต่อ</a>
-                </div>
-                 <button id="mobile-menu-button" class="md:hidden text-slate-600 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
-            </div>
-             <div id="mobile-menu" class="hidden md:hidden py-4">
-                <a class="block py-2 px-4 text-sm nav-link active" data-target="home">ภาพรวม</a>
-                <a class="block py-2 px-4 text-sm nav-link" data-target="tasks">หน้าที่รับผิดชอบ</a>
-                <a class="block py-2 px-4 text-sm nav-link" data-target="map">แผนผังงาน</a>
-                <a class="block py-2 px-4 text-sm nav-link" data-target="sessions">รหัสเซสชัน</a>
-                <a class="block py-2 px-4 text-sm nav-link" data-target="contacts">รายชื่อผู้ติดต่อ</a>
-            </div>
-        </nav>
+      <nav class="container mx-auto px-4">
+        <div class="flex items-center justify-between h-16">
+          <div class="text-xl font-bold text-teal-700">ACC2025 Staff Guide</div>
+          <div class="hidden md:flex items-center space-x-8">
+            <a class="nav-link active" data-target="home">ภาพรวม</a>
+            <a class="nav-link" data-target="tasks">หน้าที่รับผิดชอบ</a>
+            <a class="nav-link" data-target="map">แผนผังงาน</a>
+            <a class="nav-link" data-target="sessions">รหัสเซสชัน</a>
+            <a class="nav-link" data-target="contacts">รายชื่อผู้ติดต่อ</a>
+          </div>
+          <button
+            id="mobile-menu-button"
+            class="md:hidden text-slate-600 focus:outline-none"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16m-7 6h7"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden py-4">
+          <a class="block py-2 px-4 text-sm nav-link active" data-target="home"
+            >ภาพรวม</a
+          >
+          <a class="block py-2 px-4 text-sm nav-link" data-target="tasks"
+            >หน้าที่รับผิดชอบ</a
+          >
+          <a class="block py-2 px-4 text-sm nav-link" data-target="map"
+            >แผนผังงาน</a
+          >
+          <a class="block py-2 px-4 text-sm nav-link" data-target="sessions"
+            >รหัสเซสชัน</a
+          >
+          <a class="block py-2 px-4 text-sm nav-link" data-target="contacts"
+            >รายชื่อผู้ติดต่อ</a
+          >
+        </div>
+      </nav>
     </header>
 
     <main class="container mx-auto p-4 md:p-8">
+      <!-- Section: Home -->
+      <section id="home" class="content-section active">
+        <div
+          class="text-center bg-white p-8 rounded-xl shadow-lg border border-slate-200"
+        >
+          <h1 class="text-3xl md:text-4xl font-bold text-teal-800 mb-4">
+            ยินดีต้อนรับสู่ทีมงาน ACC2025
+          </h1>
+          <p class="text-lg text-slate-600 max-w-3xl mx-auto">
+            ขอขอบคุณที่ท่านมาเป็นส่วนสำคัญในการประชุม Asian Chemical Congress
+            2025 แอปพลิเคชันนี้คือคู่มือสำหรับท่าน
+            เพื่อให้การปฏิบัติงานในห้องสัมมนาเป็นไปอย่างราบรื่นและมีประสิทธิภาพสูงสุด
+          </p>
+        </div>
+        <div class="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div
+            class="bg-white p-6 rounded-xl shadow-md border border-slate-100 md:col-span-2 lg:col-span-3"
+          >
+            <h3 class="font-bold text-xl text-teal-700 mb-2">เว็ปไซต์หลัก</h3>
+            <p>
+              สามารถดูข้อมูลเพิ่มเติมเกี่ยวกับการประชุมได้ที่เว็บไซต์หลัก:
+              <a
+                href="https://acc2025thailand.com/datacontent/program"
+                class="text-teal-600 hover:underline"
+                target="_blank"
+                >https://acc2025thailand.com/datacontent/program</a
+              >
+            </p>
+        </br>
+            <h3 class="font-bold text-xl text-teal-700 mb-2">Program Book</h3>
+            <p>
+              และสามารถดูข้อมูลการเสนอผลงานโดยละเอียดได้ที่:
+              <a
+                href="https://acc2025thailand.com/media/download/E-book%20content%20-%20ver.%2021.45%20-%20date%2011%20june.pdf"
+                class="text-teal-600 hover:underline"
+                target="_blank"
+                >ASIACHEM2025 Program Book</a
+              >
+            </p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-xl shadow-md border border-slate-100"
+          >
+            <h3 class="font-bold text-xl text-teal-700 mb-2">ชื่องาน</h3>
+            <p>Asian Chemical Congress 2025 (ACC2025)</p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-xl shadow-md border border-slate-100"
+          >
+            <h3 class="font-bold text-xl text-teal-700 mb-2">
+              วันที่และสถานที่
+            </h3>
+            <p>23 - 26 มิถุนายน 2568</p>
+            <p class="text-slate-500">The Berkeley Hotel Pratunam, Bangkok</p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-xl shadow-md border border-slate-100 md:col-span-2 lg:col-span-1"
+          >
+            <h3 class="font-bold text-xl text-teal-700 mb-2">วัตถุประสงค์</h3>
+            <p>
+              เวทีแลกเปลี่ยนความรู้และสร้างเครือข่ายสำหรับนักเคมีและผู้เชี่ยวชาญ
+            </p>
+          </div>
+        </div>
+      </section>
 
-        <!-- Section: Home -->
-        <section id="home" class="content-section active">
-            <div class="text-center bg-white p-8 rounded-xl shadow-lg border border-slate-200">
-                <h1 class="text-3xl md:text-4xl font-bold text-teal-800 mb-4">ยินดีต้อนรับสู่ทีมงาน ACC2025</h1>
-                <p class="text-lg text-slate-600 max-w-3xl mx-auto">
-                    ขอขอบคุณที่ท่านมาเป็นส่วนสำคัญในการประชุม Asian Chemical Congress 2025 แอปพลิเคชันนี้คือคู่มือสำหรับท่าน เพื่อให้การปฏิบัติงานในห้องสัมมนาเป็นไปอย่างราบรื่นและมีประสิทธิภาพสูงสุด
-                </p>
-            </div>
-            <div class="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100 md:col-span-2 lg:col-span-3">
-                    <h3 class="font-bold text-xl text-teal-700 mb-2">เว็ปไซต์หลัก</h3>
-                    <p>สามารถดูข้อมูลเพิ่มเติมเกี่ยวกับการประชุมได้ที่เว็บไซต์หลัก: <a href="https://acc2025thailand.com/datacontent/program" class="text-teal-600 hover:underline" target="_blank">https://acc2025thailand.com/datacontent/program</a></p>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
-                    <h3 class="font-bold text-xl text-teal-700 mb-2">ชื่องาน</h3>
-                    <p>Asian Chemical Congress 2025 (ACC2025)</p>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
-                    <h3 class="font-bold text-xl text-teal-700 mb-2">วันที่และสถานที่</h3>
-                    <p>23 - 26 มิถุนายน 2568</p>
-                    <p class="text-slate-500">The Berkeley Hotel Pratunam, Bangkok</p>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100 md:col-span-2 lg:col-span-1">
-                    <h3 class="font-bold text-xl text-teal-700 mb-2">วัตถุประสงค์</h3>
-                    <p>เวทีแลกเปลี่ยนความรู้และสร้างเครือข่ายสำหรับนักเคมีและผู้เชี่ยวชาญ</p>
-                </div>
-            </div>
-        </section>
+      <!-- Section: Tasks -->
+      <section id="tasks" class="content-section">
+        <div class="text-center mb-8">
+          <h2 class="text-3xl font-bold text-slate-800">
+            หน้าที่และความรับผิดชอบ
+          </h2>
+          <p class="text-slate-600 mt-2">
+            นี่คือรายการตรวจสอบหน้าที่ของท่านในแต่ละช่วงเวลา
+            คลิกเพื่อดูรายละเอียด
+          </p>
+        </div>
+        <div
+          class="bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-slate-200"
+        >
+          <div class="flex justify-center border-b border-slate-200 mb-6">
+            <button
+              class="task-tab px-4 py-2 sm:px-6 sm:py-3 font-semibold text-slate-600 rounded-t-lg active"
+              data-task="before"
+            >
+              ก่อนเริ่มเซสชัน
+            </button>
+            <button
+              class="task-tab px-4 py-2 sm:px-6 sm:py-3 font-semibold text-slate-600 rounded-t-lg"
+              data-task="during"
+            >
+              ระหว่างเซสชัน
+            </button>
+            <button
+              class="task-tab px-4 py-2 sm:px-6 sm:py-3 font-semibold text-slate-600 rounded-t-lg"
+              data-task="after"
+            >
+              หลังสิ้นสุดเซสชัน
+            </button>
+          </div>
 
-        <!-- Section: Tasks -->
-        <section id="tasks" class="content-section">
-            <div class="text-center mb-8">
-                 <h2 class="text-3xl font-bold text-slate-800">หน้าที่และความรับผิดชอบ</h2>
-                 <p class="text-slate-600 mt-2">นี่คือรายการตรวจสอบหน้าที่ของท่านในแต่ละช่วงเวลา คลิกเพื่อดูรายละเอียด</p>
-            </div>
-            <div class="bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-slate-200">
-                <div class="flex justify-center border-b border-slate-200 mb-6">
-                    <button class="task-tab px-4 py-2 sm:px-6 sm:py-3 font-semibold text-slate-600 rounded-t-lg active" data-task="before">ก่อนเริ่มเซสชัน</button>
-                    <button class="task-tab px-4 py-2 sm:px-6 sm:py-3 font-semibold text-slate-600 rounded-t-lg" data-task="during">ระหว่างเซสชัน</button>
-                    <button class="task-tab px-4 py-2 sm:px-6 sm:py-3 font-semibold text-slate-600 rounded-t-lg" data-task="after">หลังสิ้นสุดเซสชัน</button>
-                </div>
+          <div id="task-content">
+            <!-- Tasks content will be injected here by JS -->
+          </div>
+        </div>
+      </section>
 
-                <div id="task-content">
-                    <!-- Tasks content will be injected here by JS -->
-                </div>
-            </div>
-        </section>
+      <!-- Section: Map -->
+      <section id="map" class="content-section">
+        <div class="text-center mb-8">
+          <h2 class="text-3xl font-bold text-slate-800">แผนผังพื้นที่จัดงาน</h2>
+          <p class="text-slate-600 mt-2">
+            แผนผังอย่างง่ายเพื่อช่วยให้ท่านทราบตำแหน่งห้องต่างๆ ภายในโรงแรม
+          </p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
+          <div class="flex justify-center space-x-2 sm:space-x-4 mb-6">
+            <button
+              class="map-button px-4 py-2 border rounded-full font-semibold active"
+              data-floor="11"
+            >
+              ชั้น 11
+            </button>
+            <button
+              class="map-button px-4 py-2 border rounded-full font-semibold"
+              data-floor="10"
+            >
+              ชั้น 10
+            </button>
+            <button
+              class="map-button px-4 py-2 border rounded-full font-semibold"
+              data-floor="5"
+            >
+              ชั้น 5
+            </button>
+          </div>
 
-        <!-- Section: Map -->
-        <section id="map" class="content-section">
-            <div class="text-center mb-8">
-                 <h2 class="text-3xl font-bold text-slate-800">แผนผังพื้นที่จัดงาน</h2>
-                 <p class="text-slate-600 mt-2">แผนผังอย่างง่ายเพื่อช่วยให้ท่านทราบตำแหน่งห้องต่างๆ ภายในโรงแรม</p>
+          <!-- Floor 11 -->
+          <div
+            id="floor-11"
+            class="floor-map active gap-4 grid-cols-2 md:grid-cols-4"
+          >
+            <div
+              class="room-block col-span-2 md:col-span-4 bg-teal-50 border-teal-200"
+            >
+              Mayfair Grand Ballroom A, B, C (ห้องบอลรูมหลัก, งานเลี้ยง)
             </div>
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
-                <div class="flex justify-center space-x-2 sm:space-x-4 mb-6">
-                    <button class="map-button px-4 py-2 border rounded-full font-semibold active" data-floor="11">ชั้น 11</button>
-                    <button class="map-button px-4 py-2 border rounded-full font-semibold" data-floor="10">ชั้น 10</button>
-                    <button class="map-button px-4 py-2 border rounded-full font-semibold" data-floor="5">ชั้น 5</button>
-                </div>
-                
-                <!-- Floor 11 -->
-                <div id="floor-11" class="floor-map active gap-4 grid-cols-2 md:grid-cols-4">
-                    <div class="room-block col-span-2 md:col-span-4 bg-teal-50 border-teal-200">Mayfair Grand Ballroom A, B, C (ห้องบอลรูมหลัก, งานเลี้ยง)</div>
-                    <div class="room-block">Jubilee Ballroom A, B</div>
-                    <div class="room-block">Boardroom 1, 3</div>                    
-                    <div class="room-block col-span-2 md:col-span-4 bg-yellow-50 border-yellow-300">Foyer & Registration (จุดลงทะเบียน)</div>
-                    <div class="room-block col-span-2 md:col-span-3 bg-red-50 border-red-200">Poster Area</div>
-                    <div class="room-block col-span-2 md:col-span-4 bg-teal-50 border-teal-200"><img src="https://acc2025thailand.com/media/venue/11-Fl_0.png" alt="floor-11" class="block mx-auto"></div>
-                </div>
+            <div class="room-block">Jubilee Ballroom A, B</div>
+            <div class="room-block">Boardroom 1, 3</div>
+            <div
+              class="room-block col-span-2 md:col-span-4 bg-yellow-50 border-yellow-300"
+            >
+              Foyer & Registration (จุดลงทะเบียน)
+            </div>
+            <div
+              class="room-block col-span-2 md:col-span-3 bg-red-50 border-red-200"
+            >
+              Poster Area
+            </div>
+            <div
+              class="room-block col-span-2 md:col-span-4 bg-teal-50 border-teal-200"
+            >
+              <img
+                src="https://acc2025thailand.com/media/venue/11-Fl_0.png"
+                alt="floor-11"
+                class="block mx-auto"
+              />
+            </div>
+          </div>
 
-                <!-- Floor 10 -->
-                <div id="floor-10" class="floor-map gap-4 grid-cols-2 md:grid-cols-3">
-                    <div class="room-block">Palladium Hall</div>
-                    <div class="room-block">The Lounge</div>
-                    <div class="room-block">Mulberry</div>
-                    <div class="room-block col-span-2 md:col-span-4 bg-teal-50 border-teal-200"><img src="https://acc2025thailand.com/media/venue/10-Fl_0.png" alt="floor-10" width="75%" class="block mx-auto"></div>
-                </div>
+          <!-- Floor 10 -->
+          <div id="floor-10" class="floor-map gap-4 grid-cols-2 md:grid-cols-3">
+            <div class="room-block">Palladium Hall</div>
+            <div class="room-block">The Lounge</div>
+            <div class="room-block">Mulberry</div>
+            <div
+              class="room-block col-span-2 md:col-span-4 bg-teal-50 border-teal-200"
+            >
+              <img
+                src="https://acc2025thailand.com/media/venue/10-Fl_0.png"
+                alt="floor-10"
+                width="75%"
+                class="block mx-auto"
+              />
+            </div>
+          </div>
 
-                <!-- Floor 5 -->
-                <div id="floor-5" class="floor-map gap-2 grid-cols-2">
-                    <div class="room-block">Kensington Ballroom A</div>
-                    <div class="room-block">Kensington Ballroom B</div>
-                    <div class="room-block col-span-2 md:col-span-4 bg-teal-50 border-teal-200"><img src="https://acc2025thailand.com/media/venue/5-Fl_0.png" alt="floor-5" class="block mx-auto"></div>
-                </div>
+          <!-- Floor 5 -->
+          <div id="floor-5" class="floor-map gap-2 grid-cols-2">
+            <div class="room-block">Kensington Ballroom A</div>
+            <div class="room-block">Kensington Ballroom B</div>
+            <div
+              class="room-block col-span-2 md:col-span-4 bg-teal-50 border-teal-200"
+            >
+              <img
+                src="https://acc2025thailand.com/media/venue/5-Fl_0.png"
+                alt="floor-5"
+                class="block mx-auto"
+              />
             </div>
-        </section>
+          </div>
+        </div>
+      </section>
 
-        <!-- Section: Sessions -->
-        <section id="sessions" class="content-section">
-             <div class="text-center mb-8">
-                 <h2 class="text-3xl font-bold text-slate-800">รหัสเซสชัน (Session Codes)</h2>
-                 <p class="text-slate-600 mt-2">ใช้สำหรับอ้างอิงหัวข้อการบรรยายในแต่ละห้อง พิมพ์เพื่อค้นหา</p>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
-                <input type="text" id="session-search" placeholder="ค้นหารหัส หรือ หัวข้อ..." class="w-full p-3 mb-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full">
-                        <thead class="bg-slate-100">
-                            <tr>
-                                <th class="px-4 py-2 text-left font-semibold text-slate-600">รหัส</th>
-                                <th class="px-4 py-2 text-left font-semibold text-slate-600">ชื่อหัวข้อเซสชัน</th>
-                            </tr>
-                        </thead>
-                        <tbody id="session-table-body">
-                           <!-- Session data will be injected here by JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
+      <!-- Section: Sessions -->
+      <section id="sessions" class="content-section">
+        <div class="text-center mb-8">
+          <h2 class="text-3xl font-bold text-slate-800">
+            รหัสเซสชัน (Session Codes)
+          </h2>
+          <p class="text-slate-600 mt-2">
+            ใช้สำหรับอ้างอิงหัวข้อการบรรยายในแต่ละห้อง พิมพ์เพื่อค้นหา
+          </p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
+          <input
+            type="text"
+            id="session-search"
+            placeholder="ค้นหารหัส หรือ หัวข้อ..."
+            class="w-full p-3 mb-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+          />
+          <div class="overflow-x-auto">
+            <table class="min-w-full">
+              <thead class="bg-slate-100">
+                <tr>
+                  <th class="px-4 py-2 text-left font-semibold text-slate-600">
+                    รหัส
+                  </th>
+                  <th class="px-4 py-2 text-left font-semibold text-slate-600">
+                    ชื่อหัวข้อเซสชัน
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="session-table-body">
+                <!-- Session data will be injected here by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
 
-        <!-- Section: Contacts -->
-        <section id="contacts" class="content-section">
-            <div class="text-center mb-8">
-                 <h2 class="text-3xl font-bold text-slate-800">รายชื่อผู้ติดต่อสำคัญ</h2>
-                 <p class="text-slate-600 mt-2">สำหรับติดต่อประสานงานในกรณีเร่งด่วนหรือต้องการความช่วยเหลือ</p>
-            </div>
-            <div class="grid md:grid-cols-2 gap-6">
-                 <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
-                    <h3 class="font-bold text-xl text-teal-700 mb-2">ผู้ประสานงานหลัก (Overall Coordinator)</h3>
-                    <p class="text-lg">[ชื่อ-นามสกุล]</p>
-                    <p class="text-slate-500">เบอร์โทร: [เบอร์โทรศัพท์]</p>
-                </div>
-                 <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
-                    <h3 class="font-bold text-xl text-teal-700 mb-2">ฝ่ายเทคนิคและอุปกรณ์ (AV Support)</h3>
-                    <p class="text-lg">[ชื่อ-นามสกุล]</p>
-                    <p class="text-slate-500">เบอร์โทร: [เบอร์โทรศัพท์]</p>
-                </div>
-                 <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
-                    <h3 class="font-bold text-xl text-teal-700 mb-2">ฝ่ายรักษาความปลอดภัย (Security)</h3>
-                     <p class="text-lg">ติดต่อผ่านโรงแรม</p>
-                    <p class="text-slate-500">เบอร์โทร: [เบอร์โทรศัพท์ของโรงแรม]</p>
-                </div>
-            </div>
-        </section>
-
+      <!-- Section: Contacts -->
+      <section id="contacts" class="content-section">
+        <div class="text-center mb-8">
+          <h2 class="text-3xl font-bold text-slate-800">
+            รายชื่อผู้ติดต่อสำคัญ
+          </h2>
+          <p class="text-slate-600 mt-2">
+            สำหรับติดต่อประสานงานในกรณีเร่งด่วนหรือต้องการความช่วยเหลือ
+          </p>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div
+            class="bg-white p-6 rounded-xl shadow-md border border-slate-100"
+          >
+            <h3 class="font-bold text-xl text-teal-700 mb-2">
+              ผู้ประสานงานหลัก (Overall Coordinator)
+            </h3>
+            <p class="text-lg">[ชื่อ-นามสกุล]</p>
+            <p class="text-slate-500">เบอร์โทร: [เบอร์โทรศัพท์]</p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-xl shadow-md border border-slate-100"
+          >
+            <h3 class="font-bold text-xl text-teal-700 mb-2">
+              ฝ่ายเทคนิคและอุปกรณ์ (AV Support)
+            </h3>
+            <p class="text-lg">[ชื่อ-นามสกุล]</p>
+            <p class="text-slate-500">เบอร์โทร: [เบอร์โทรศัพท์]</p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-xl shadow-md border border-slate-100"
+          >
+            <h3 class="font-bold text-xl text-teal-700 mb-2">
+              ฝ่ายรักษาความปลอดภัย (Security)
+            </h3>
+            <p class="text-lg">ติดต่อผ่านโรงแรม</p>
+            <p class="text-slate-500">เบอร์โทร: [เบอร์โทรศัพท์ของโรงแรม]</p>
+          </div>
+        </div>
+      </section>
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const navLinks = document.querySelectorAll('.nav-link');
-            const contentSections = document.querySelectorAll('.content-section');
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
+      document.addEventListener("DOMContentLoaded", function () {
+        const navLinks = document.querySelectorAll(".nav-link");
+        const contentSections = document.querySelectorAll(".content-section");
+        const mobileMenuButton = document.getElementById("mobile-menu-button");
+        const mobileMenu = document.getElementById("mobile-menu");
 
-            function switchTab(targetId) {
-                contentSections.forEach(section => {
-                    section.classList.toggle('active', section.id === targetId);
-                });
-                navLinks.forEach(link => {
-                    link.classList.toggle('active', link.dataset.target === targetId);
-                });
+        function switchTab(targetId) {
+          contentSections.forEach((section) => {
+            section.classList.toggle("active", section.id === targetId);
+          });
+          navLinks.forEach((link) => {
+            link.classList.toggle("active", link.dataset.target === targetId);
+          });
+        }
+
+        navLinks.forEach((link) => {
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const targetId = link.dataset.target;
+            switchTab(targetId);
+            if (mobileMenu.classList.contains("block")) {
+              mobileMenu.classList.remove("block");
+              mobileMenu.classList.add("hidden");
             }
+          });
+        });
 
-            navLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const targetId = link.dataset.target;
-                    switchTab(targetId);
-                    if (mobileMenu.classList.contains('block')) {
-                        mobileMenu.classList.remove('block');
-                        mobileMenu.classList.add('hidden');
-                    }
-                });
+        mobileMenuButton.addEventListener("click", () => {
+          mobileMenu.classList.toggle("hidden");
+          mobileMenu.classList.toggle("block");
+        });
+
+        // Task tabs logic
+        const taskTabs = document.querySelectorAll(".task-tab");
+        const taskContentContainer = document.getElementById("task-content");
+
+        const tasks = {
+          before: [
+            "<strong>ตรวจสอบความพร้อมห้อง:</strong> จัดเตรียมไมโครโฟน, เปิดคอมพิวเตอร์, โปรเจคเตอร์ และทดสอบเสียง",
+            "<strong>ต้อนรับผู้บรรยาย:</strong> แนะนำตัว, ช่วยคัดลอกไฟล์ และแจ้งกำหนดการเวลา",
+            "<strong>เตรียมเอกสาร (ถ้ามี):</strong> จัดเตรียมเอกสารประกอบการบรรยายให้พร้อม",
+          ],
+          during: [
+            "<strong>ควบคุมอุปกรณ์:</strong> ตรวจสอบคุณภาพเสียงและภาพ ระวังเรื่องไมค์แบตหมด",
+            "<strong>ช่วยควบคุมเวลา:</strong> ให้สัญญาณเตือนเวลาแก่ผู้บรรยายตามที่กำหนด",
+            "<strong>อำนวยความสะดวก:</strong> เตรียมไมค์สำหรับ Q&A, ตอบคำถามเบื้องต้น",
+            "<strong>แก้ไขปัญหาเฉพาะหน้า:</strong> ประสานงานกับประธานเซสชันหากเกิดความล่าช้า",
+          ],
+          after: [
+            "<strong>ปิดอุปกรณ์:</strong> ปิดคอมพิวเตอร์, โปรเจคเตอร์ และเก็บอุปกรณ์ให้เรียบร้อย",
+            "<strong>ตรวจสอบความเรียบร้อย:</strong> ตรวจสอบของที่อาจหลงลืมไว้ในห้อง",
+            "<strong>รายงานปัญหา:</strong> แจ้งปัญหาที่ยังไม่ได้รับการแก้ไขให้ผู้ประสานงานหลักทราบ",
+          ],
+        };
+
+        function renderTasks(taskKey) {
+          taskContentContainer.innerHTML = `<ul class="space-y-4 list-inside list-disc text-slate-700">${tasks[
+            taskKey
+          ]
+            .map((task) => `<li class="pl-2">${task}</li>`)
+            .join("")}</ul>`;
+        }
+
+        taskTabs.forEach((tab) => {
+          tab.addEventListener("click", () => {
+            taskTabs.forEach((t) => t.classList.remove("active"));
+            tab.classList.add("active");
+            renderTasks(tab.dataset.task);
+          });
+        });
+
+        renderTasks("before"); // Initial render
+
+        // Map logic
+        const mapButtons = document.querySelectorAll(".map-button");
+        const floorMaps = document.querySelectorAll(".floor-map");
+
+        mapButtons.forEach((button) => {
+          button.addEventListener("click", () => {
+            mapButtons.forEach((b) => b.classList.remove("active"));
+            button.classList.add("active");
+
+            floorMaps.forEach((map) => {
+              map.classList.toggle(
+                "active",
+                map.id === `floor-${button.dataset.floor}`
+              );
             });
-            
-            mobileMenuButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-                mobileMenu.classList.toggle('block');
-            });
+          });
+        });
 
-            // Task tabs logic
-            const taskTabs = document.querySelectorAll('.task-tab');
-            const taskContentContainer = document.getElementById('task-content');
+        // Session data and search logic
+        const sessionData = [
+          { code: "AC", name: "Analytical Chemistry" },
+          { code: "CE", name: "Chemistry for Energy and Environment" },
+          { code: "FA", name: "Food, Agriculture, and Cosmetics" },
+          { code: "FE", name: "Future in Chemical Education" },
+          { code: "IE", name: "Industrial and Engineering Chemistry" },
+          { code: "IC", name: "Inorganic Chemistry" },
+          { code: "MN", name: "Materials Science and Nanotechnology" },
+          {
+            code: "NB",
+            name: "Natural Products, Biological Chemistry and Chemical Biology",
+          },
+          { code: "OM", name: "Organic Synthesis and Medicinal Chemistry" },
+          { code: "PT", name: "Physical and Theoretical Chemistry" },
+          { code: "PC", name: "Polymers and Bio-based Materials" },
+          { code: "SS", name: "Science Projects for Students Showcase" },
+          {
+            code: "US",
+            name: "Future Chemistry Research Presentation for Undergraduate Students",
+          },
+          {
+            code: "S1",
+            name: "Thailand-Japan Bilateral Symposium: Advancing Synchrotron Science through Experimental and Computational Chemistry Synergy",
+          },
+          { code: "S2", name: "Catalytic Systems for Contemporary Challenges" },
+          {
+            code: "S3",
+            name: "Advanced Coordination Materials and Catalysis for Environment",
+          },
+          {
+            code: "S4",
+            name: "Understanding and Development to Address the PFAS Problems in Thailand for Sustainable Environment",
+          },
+          { code: "S5", name: "AI in Drug Discovery Research" },
+          {
+            code: "S6",
+            name: "Advances in Nutraceutical Chemistry Shaping the Future of Disease Prevention in Asia",
+          },
+          {
+            code: "S8",
+            name: "Green Chemistry; Paving the Way to a Sustainable Future",
+          },
+          { code: "S9", name: "Ryoji Noyori ACES Awards Symposium" },
+          {
+            code: "SA",
+            name: "Young Career Development under FACS-ACS Collaboration",
+          },
+          {
+            code: "SB",
+            name: "TU-Frontier Lab-JEOL joint session Contaminants of Emerging Concern: PFAS & Microplastics",
+          },
+          {
+            code: "SC",
+            name: "Sustainable chemistry Focusing on Clean energy Good Health and Well-Being (Thailand-Taiwan)",
+          },
+          {
+            code: "SD",
+            name: "IMS-CU Bilateral Symposium for Driving Forward Frontier Research",
+          },
+          {
+            code: "SE",
+            name: "Unlocking the Power of Nature: Cutting-Edge Applications of Natural Products, Biological Chemistry, and Chemical Biology",
+          },
+          {
+            code: "SG",
+            name: "Sustainable Chemistry for Agricultural Residue Valorization",
+          },
+        ];
 
-            const tasks = {
-                before: [
-                    "<strong>ตรวจสอบความพร้อมห้อง:</strong> จัดเตรียมไมโครโฟน, เปิดคอมพิวเตอร์, โปรเจคเตอร์ และทดสอบเสียง",
-                    "<strong>ต้อนรับผู้บรรยาย:</strong> แนะนำตัว, ช่วยคัดลอกไฟล์ และแจ้งกำหนดการเวลา",
-                    "<strong>เตรียมเอกสาร (ถ้ามี):</strong> จัดเตรียมเอกสารประกอบการบรรยายให้พร้อม"
-                ],
-                during: [
-                    "<strong>ควบคุมอุปกรณ์:</strong> ตรวจสอบคุณภาพเสียงและภาพ ระวังเรื่องไมค์แบตหมด",
-                    "<strong>ช่วยควบคุมเวลา:</strong> ให้สัญญาณเตือนเวลาแก่ผู้บรรยายตามที่กำหนด",
-                    "<strong>อำนวยความสะดวก:</strong> เตรียมไมค์สำหรับ Q&A, ตอบคำถามเบื้องต้น",
-                    "<strong>แก้ไขปัญหาเฉพาะหน้า:</strong> ประสานงานกับประธานเซสชันหากเกิดความล่าช้า"
-                ],
-                after: [
-                    "<strong>ปิดอุปกรณ์:</strong> ปิดคอมพิวเตอร์, โปรเจคเตอร์ และเก็บอุปกรณ์ให้เรียบร้อย",
-                    "<strong>ตรวจสอบความเรียบร้อย:</strong> ตรวจสอบของที่อาจหลงลืมไว้ในห้อง",
-                    "<strong>รายงานปัญหา:</strong> แจ้งปัญหาที่ยังไม่ได้รับการแก้ไขให้ผู้ประสานงานหลักทราบ"
-                ]
-            };
-            
-            function renderTasks(taskKey) {
-                taskContentContainer.innerHTML = `<ul class="space-y-4 list-inside list-disc text-slate-700">${tasks[taskKey].map(task => `<li class="pl-2">${task}</li>`).join('')}</ul>`;
-            }
+        const sessionTableBody = document.getElementById("session-table-body");
+        const sessionSearch = document.getElementById("session-search");
 
-            taskTabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    taskTabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    renderTasks(tab.dataset.task);
-                });
-            });
+        function renderSessionTable(filter = "") {
+          const lowercasedFilter = filter.toLowerCase();
+          const filteredData = sessionData.filter(
+            (item) =>
+              item.code.toLowerCase().includes(lowercasedFilter) ||
+              item.name.toLowerCase().includes(lowercasedFilter)
+          );
 
-            renderTasks('before'); // Initial render
+          if (filteredData.length === 0) {
+            sessionTableBody.innerHTML = `<tr><td colspan="2" class="text-center p-4 text-slate-500">ไม่พบข้อมูลที่ค้นหา</td></tr>`;
+            return;
+          }
 
-            // Map logic
-            const mapButtons = document.querySelectorAll('.map-button');
-            const floorMaps = document.querySelectorAll('.floor-map');
-            
-            mapButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    mapButtons.forEach(b => b.classList.remove('active'));
-                    button.classList.add('active');
-
-                    floorMaps.forEach(map => {
-                        map.classList.toggle('active', map.id === `floor-${button.dataset.floor}`);
-                    });
-                });
-            });
-            
-            // Session data and search logic
-            const sessionData = [
-                { code: "AC", name: "Analytical Chemistry" },
-                { code: "CE", name: "Chemistry for Energy and Environment" },
-                { code: "FA", name: "Food, Agriculture, and Cosmetics" },
-                { code: "FE", name: "Future in Chemical Education" },
-                { code: "IE", name: "Industrial and Engineering Chemistry" },
-                { code: "IC", name: "Inorganic Chemistry" },
-                { code: "MN", name: "Materials Science and Nanotechnology" },
-                { code: "NB", name: "Natural Products, Biological Chemistry and Chemical Biology" },
-                { code: "OM", name: "Organic Synthesis and Medicinal Chemistry" },
-                { code: "PT", name: "Physical and Theoretical Chemistry" },
-                { code: "PC", name: "Polymers and Bio-based Materials" },
-                { code: "SS", name: "Science Projects for Students Showcase" },
-                { code: "US", name: "Future Chemistry Research Presentation for Undergraduate Students" },
-                { code: "S1", name: "Thailand-Japan Bilateral Symposium: Advancing Synchrotron Science through Experimental and Computational Chemistry Synergy" },
-                { code: "S2", name: "Catalytic Systems for Contemporary Challenges" },
-                { code: "S3", name: "Advanced Coordination Materials and Catalysis for Environment" },
-                { code: "S4", name: "Understanding and Development to Address the PFAS Problems in Thailand for Sustainable Environment" },
-                { code: "S5", name: "AI in Drug Discovery Research" },
-                { code: "S6", name: "Advances in Nutraceutical Chemistry Shaping the Future of Disease Prevention in Asia" },
-                { code: "S8", name: "Green Chemistry; Paving the Way to a Sustainable Future" },
-                { code: "S9", name: "Ryoji Noyori ACES Awards Symposium" },
-                { code: "SA", name: "Young Career Development under FACS-ACS Collaboration" },
-                { code: "SB", name: "TU-Frontier Lab-JEOL joint session Contaminants of Emerging Concern: PFAS & Microplastics" },
-                { code: "SC", name: "Sustainable chemistry Focusing on Clean energy Good Health and Well-Being (Thailand-Taiwan)" },
-                { code: "SD", name: "IMS-CU Bilateral Symposium for Driving Forward Frontier Research" },
-                { code: "SE", name: "Unlocking the Power of Nature: Cutting-Edge Applications of Natural Products, Biological Chemistry, and Chemical Biology" },
-                { code: "SG", name: "Sustainable Chemistry for Agricultural Residue Valorization" }
-            ];
-
-            const sessionTableBody = document.getElementById('session-table-body');
-            const sessionSearch = document.getElementById('session-search');
-
-            function renderSessionTable(filter = '') {
-                const lowercasedFilter = filter.toLowerCase();
-                const filteredData = sessionData.filter(item => 
-                    item.code.toLowerCase().includes(lowercasedFilter) ||
-                    item.name.toLowerCase().includes(lowercasedFilter)
-                );
-                
-                if (filteredData.length === 0) {
-                     sessionTableBody.innerHTML = `<tr><td colspan="2" class="text-center p-4 text-slate-500">ไม่พบข้อมูลที่ค้นหา</td></tr>`;
-                     return;
-                }
-
-                sessionTableBody.innerHTML = filteredData.map(item => `
+          sessionTableBody.innerHTML = filteredData
+            .map(
+              (item) => `
                     <tr class="border-b border-slate-200 hover:bg-slate-50">
                         <td class="px-4 py-3 font-mono text-teal-600 font-semibold">${item.code}</td>
                         <td class="px-4 py-3">${item.name}</td>
                     </tr>
-                `).join('');
-            }
+                `
+            )
+            .join("");
+        }
 
-            sessionSearch.addEventListener('keyup', (e) => {
-                renderSessionTable(e.target.value);
-            });
-            
-            renderSessionTable(); // Initial render
+        sessionSearch.addEventListener("keyup", (e) => {
+          renderSessionTable(e.target.value);
         });
+
+        renderSessionTable(); // Initial render
+      });
     </script>
-</body>
+  </body>
 </html>
