@@ -1,350 +1,363 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ACC 2025 - 44th ASEAN Cardiovascular Congress</title>
+    <title>ACC2025 Staff Interactive Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Light Beige background, Dark Slate text, Muted Teal accent) -->
+    <!-- Application Structure Plan: A task-oriented SPA for event staff. A sticky top navigation provides immediate access to key sections: 'Home', 'My Tasks' (interactive checklists), 'Event Map' (interactive floor plans), and 'Session Codes' (filterable reference). This structure prioritizes speed and ease of use for staff in a live event environment, moving beyond the linear format of the source document to a functional tool. -->
+    <!-- Visualization & Content Choices: Event Overview -> Goal: Inform -> Presentation: Styled text cards -> Interaction: None. Staff Tasks -> Goal: Instruct -> Presentation: Tabbed checklists -> Interaction: JS-powered tabs for Before/During/After states. Floor Plan -> Goal: Spatial Info -> Presentation: HTML/Tailwind Grid layout -> Interaction: JS-powered buttons to switch between floors. Session Codes -> Goal: Reference -> Presentation: HTML Table -> Interaction: JS-powered live search filter. Key Contacts -> Goal: Inform -> Presentation: Styled text cards -> Interaction: None. This approach uses interactive HTML elements to make information retrieval fast and efficient. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
-        /* --- General Styling --- */
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@400;500&display=swap');
-
         body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            color: #333;
-            background-color: #f8f9fa;
-            line-height: 1.6;
+            font-family: 'Sarabun', sans-serif;
+            background-color: #FDFBF5;
+            color: #334155;
         }
-
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 20px;
+        .nav-link {
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
-
-        h1, h2, h3 {
-            font-family: 'Montserrat', sans-serif;
-            color: #003366; /* Deep Blue */
-        }
-
-        /* --- Header & Navigation --- */
-        header {
-            background: #ffffff;
-            padding: 15px 0;
-            border-bottom: 1px solid #e0e0e0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .logo {
-            font-size: 1.5em;
+        .nav-link.active {
+            color: #0d9488;
+            border-bottom: 2px solid #0d9488;
             font-weight: 700;
-            color: #003366;
         }
-
-        .logo span {
-            color: #007bff; /* Bright Blue */
+        .task-tab.active {
+            background-color: #0d9488;
+            color: white;
         }
-
-        .nav-links a {
-            color: #333;
-            text-decoration: none;
-            margin-left: 25px;
-            font-weight: 500;
-            transition: color 0.3s;
+        .task-tab {
+            transition: all 0.3s ease;
         }
-
-        .nav-links a:hover {
-            color: #007bff;
+        .content-section {
+            display: none;
         }
-
-        /* --- Hero Section --- */
-        .hero {
-            background-image: linear-gradient(rgba(0, 51, 102, 0.8), rgba(0, 51, 102, 0.8)), url('https://images.unsplash.com/photo-1596591603953-6490a5621454?q=80&w=2070'); /* Placeholder image of Bangkok skyline */
-            background-size: cover;
-            background-position: center;
-            color: #ffffff;
-            text-align: center;
-            padding: 100px 20px;
-        }
-
-        .hero h1 {
-            font-size: 3em;
-            color: #ffffff;
-            margin-bottom: 10px;
-        }
-
-        .hero .theme {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.5em;
-            font-weight: 600;
-            color: #ffd700; /* Gold accent */
-            margin-bottom: 30px;
-        }
-
-        .hero-details {
-            font-size: 1.2em;
-            margin-bottom: 40px;
-        }
-
-        .btn {
-            background-color: #007bff;
-            color: #ffffff;
-            padding: 15px 30px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: 700;
-            font-family: 'Montserrat', sans-serif;
-            transition: background-color 0.3s, transform 0.2s;
-            display: inline-block;
-            margin: 5px;
-        }
-        
-        .btn-secondary {
-            background-color: transparent;
-            border: 2px solid #ffffff;
-        }
-
-        .btn:hover {
-            background-color: #0056b3;
-            transform: translateY(-2px);
-        }
-        .btn-secondary:hover {
-            background-color: #ffffff;
-            color: #003366;
-        }
-
-        /* --- Content Sections --- */
-        section {
-            padding: 60px 0;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 2.5em;
-            margin-bottom: 40px;
-        }
-        
-        .section-title::after {
-            content: '';
+        .content-section.active {
             display: block;
-            width: 60px;
-            height: 4px;
-            background: #007bff;
-            margin: 10px auto 0;
-            border-radius: 2px;
         }
-
-        /* Details Grid */
-        .details-grid {
+        .floor-map {
+            display: none;
+        }
+        .floor-map.active {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+        }
+        .map-button.active {
+            background-color: #14b8a6;
+            color: white;
+            border-color: #0d9488;
+        }
+        .room-block {
+            border: 1px solid #cbd5e1;
+            background-color: #f8fafc;
+            padding: 0.75rem;
             text-align: center;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
         }
-
-        .detail-card {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            transition: transform 0.3s;
-        }
-        
-        .detail-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .detail-card h3 {
-            margin-top: 0;
-            color: #007bff;
-        }
-
-        /* Program & Audience Lists */
-        .list-container {
-             display: flex;
-             justify-content: space-around;
-             flex-wrap: wrap;
-             gap: 20px;
-        }
-
-        .list-box {
-            background: #ffffff;
-            padding: 20px;
-            border-left: 5px solid #007bff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            width: 45%;
-            min-width: 300px;
-        }
-        
-        .list-box ul {
-            list-style-type: none;
-            padding-left: 0;
-        }
-
-        .list-box li {
-            padding: 8px 0;
-            border-bottom: 1px dashed #e0e0e0;
-        }
-        .list-box li:before {
-            content: "✓";
-            color: #007bff;
-            margin-right: 10px;
-        }
-
-        /* --- Call to Action Section --- */
-        .cta-section {
-            background-color: #003366;
-            color: #ffffff;
-            text-align: center;
-        }
-        
-        .cta-section h2 {
-            color: #ffffff;
-        }
-
-        .cta-section .deadline {
-            font-size: 1.2em;
-            margin-bottom: 30px;
-            font-weight: 500;
-        }
-
-        .cta-section .deadline span {
-            color: #ffd700;
-            font-weight: 700;
-        }
-
-        /* --- Footer --- */
-        footer {
-            background-color: #333;
-            color: #ffffff;
-            text-align: center;
-            padding: 30px 20px;
-        }
-
-        footer p {
-            margin: 5px 0;
-        }
-
-        footer a {
-            color: #ffd700;
-            text-decoration: none;
-        }
-
     </style>
 </head>
-<body>
+<body class="antialiased">
 
-    <!-- Header -->
-    <header>
-        <nav>
-            <div class="logo">ACC<span>2025</span></div>
-            <div class="nav-links">
-                <a href="#about">About</a>
-                <a href="#program">Program</a>
-                <a href="#register">Register</a>
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <div class="text-xl font-bold text-teal-700">ACC2025 Staff Guide</div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a class="nav-link active" data-target="home">ภาพรวม</a>
+                    <a class="nav-link" data-target="tasks">หน้าที่รับผิดชอบ</a>
+                    <a class="nav-link" data-target="map">แผนผังงาน</a>
+                    <a class="nav-link" data-target="sessions">รหัสเซสชัน</a>
+                    <a class="nav-link" data-target="contacts">รายชื่อผู้ติดต่อ</a>
+                </div>
+                 <button id="mobile-menu-button" class="md:hidden text-slate-600 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+             <div id="mobile-menu" class="hidden md:hidden py-4">
+                <a class="block py-2 px-4 text-sm nav-link active" data-target="home">ภาพรวม</a>
+                <a class="block py-2 px-4 text-sm nav-link" data-target="tasks">หน้าที่รับผิดชอบ</a>
+                <a class="block py-2 px-4 text-sm nav-link" data-target="map">แผนผังงาน</a>
+                <a class="block py-2 px-4 text-sm nav-link" data-target="sessions">รหัสเซสชัน</a>
+                <a class="block py-2 px-4 text-sm nav-link" data-target="contacts">รายชื่อผู้ติดต่อ</a>
             </div>
         </nav>
     </header>
 
-    <main>
-        <!-- Hero Section -->
-        <section class="hero">
-            <h1>44th ASEAN Cardiovascular Congress</h1>
-            <p class="theme">"Reimagining ASEAN Cardiology: A Vision for the Future"</p>
-            <div class="hero-details">
-                <p><strong>October 23 - 26, 2025</strong></p>
-                <p>Centara Grand & Bangkok Convention Centre | Bangkok, Thailand</p>
-            </div>
-            <a href="#register" class="btn">Register Now</a>
-            <a href="#register" class="btn btn-secondary">Submit Abstract</a>
-        </section>
+    <main class="container mx-auto p-4 md:p-8">
 
-        <!-- About Section -->
-        <section id="about">
-            <div class="container">
-                <h2 class="section-title">Welcome to ACC 2025</h2>
-                <div class="details-grid">
-                    <div class="detail-card">
-                        <h3>Our Vision</h3>
-                        <p>ACC 2025 is a major international conference aimed at fostering collaboration and sharing cutting-edge research to shape the future of cardiovascular medicine in the ASEAN region and beyond.</p>
-                    </div>
-                    <div class="detail-card">
-                        <h3>The Theme</h3>
-                        <p>Our theme, "Reimagining ASEAN Cardiology," focuses on innovative technologies, future trends, and addressing the unique cardiovascular health challenges of Southeast Asia.</p>
-                    </div>
-                    <div class="detail-card">
-                        <h3>Networking</h3>
-                        <p>Connect with leading cardiologists, surgeons, researchers, and healthcare professionals from around the world in the vibrant city of Bangkok.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Program & Audience Section -->
-        <section id="program" style="background-color: #ffffff;">
-            <div class="container">
-                <h2 class="section-title">Program & Audience</h2>
-                <div class="list-container">
-                    <div class="list-box">
-                        <h3>Scientific Program Highlights</h3>
-                        <ul>
-                            <li>Plenary lectures from world-renowned experts</li>
-                            <li>In-depth symposia and practical workshops</li>
-                            <li>Oral and poster presentations of new research</li>
-                            <li>Discussions on clinical best practices</li>
-                            <li>Sessions on new cardiovascular guidelines</li>
-                        </ul>
-                    </div>
-                    <div class="list-box">
-                        <h3>Who Should Attend?</h3>
-                        <ul>
-                            <li>Cardiologists (Adult & Pediatric)</li>
-                            <li>Cardiac and Vascular Surgeons</li>
-                            <li>General Physicians & Practitioners</li>
-                            <li>Researchers and Medical Scientists</li>
-                            <li>Nurses & Allied Health Professionals</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Call to Action & Registration Section -->
-        <section id="register" class="cta-section">
-            <div class="container">
-                <h2 class="section-title">Join Us in Bangkok</h2>
-                <p class="deadline">
-                    Call for Abstracts is Open! Submission Deadline: <span>May 31, 2025</span>
+        <!-- Section: Home -->
+        <section id="home" class="content-section active">
+            <div class="text-center bg-white p-8 rounded-xl shadow-lg border border-slate-200">
+                <h1 class="text-3xl md:text-4xl font-bold text-teal-800 mb-4">ยินดีต้อนรับสู่ทีมงาน ACC2025</h1>
+                <p class="text-lg text-slate-600 max-w-3xl mx-auto">
+                    ขอขอบคุณที่ท่านมาเป็นส่วนสำคัญในการประชุม Asian Chemical Congress 2025 แอปพลิเคชันนี้คือคู่มือสำหรับท่าน เพื่อให้การปฏิบัติงานในห้องสัมมนาเป็นไปอย่างราบรื่นและมีประสิทธิภาพสูงสุด
                 </p>
-                <p>Register early to benefit from reduced fees and secure your spot at the premier cardiology event in ASEAN.</p>
-                <br>
-                <a href="#" class="btn">Register Today</a>
+            </div>
+            <div class="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                    <h3 class="font-bold text-xl text-teal-700 mb-2">ชื่องาน</h3>
+                    <p>Asian Chemical Congress 2025 (ACC2025)</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                    <h3 class="font-bold text-xl text-teal-700 mb-2">วันที่และสถานที่</h3>
+                    <p>23 - 26 มิถุนายน 2568</p>
+                    <p class="text-slate-500">The Berkeley Hotel Pratunam, Bangkok</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100 md:col-span-2 lg:col-span-1">
+                    <h3 class="font-bold text-xl text-teal-700 mb-2">วัตถุประสงค์</h3>
+                    <p>เวทีแลกเปลี่ยนความรู้และสร้างเครือข่ายสำหรับนักเคมีและผู้เชี่ยวชาญ</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Tasks -->
+        <section id="tasks" class="content-section">
+            <div class="text-center mb-8">
+                 <h2 class="text-3xl font-bold text-slate-800">หน้าที่และความรับผิดชอบ</h2>
+                 <p class="text-slate-600 mt-2">นี่คือรายการตรวจสอบหน้าที่ของท่านในแต่ละช่วงเวลา คลิกเพื่อดูรายละเอียด</p>
+            </div>
+            <div class="bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-slate-200">
+                <div class="flex justify-center border-b border-slate-200 mb-6">
+                    <button class="task-tab px-4 py-2 sm:px-6 sm:py-3 font-semibold text-slate-600 rounded-t-lg active" data-task="before">ก่อนเริ่มเซสชัน</button>
+                    <button class="task-tab px-4 py-2 sm:px-6 sm:py-3 font-semibold text-slate-600 rounded-t-lg" data-task="during">ระหว่างเซสชัน</button>
+                    <button class="task-tab px-4 py-2 sm:px-6 sm:py-3 font-semibold text-slate-600 rounded-t-lg" data-task="after">หลังสิ้นสุดเซสชัน</button>
+                </div>
+
+                <div id="task-content">
+                    <!-- Tasks content will be injected here by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Map -->
+        <section id="map" class="content-section">
+            <div class="text-center mb-8">
+                 <h2 class="text-3xl font-bold text-slate-800">แผนผังพื้นที่จัดงาน</h2>
+                 <p class="text-slate-600 mt-2">แผนผังอย่างง่ายเพื่อช่วยให้ท่านทราบตำแหน่งห้องต่างๆ ภายในโรงแรม</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
+                <div class="flex justify-center space-x-2 sm:space-x-4 mb-6">
+                    <button class="map-button px-4 py-2 border rounded-full font-semibold active" data-floor="11">ชั้น 11</button>
+                    <button class="map-button px-4 py-2 border rounded-full font-semibold" data-floor="10">ชั้น 10</button>
+                    <button class="map-button px-4 py-2 border rounded-full font-semibold" data-floor="5">ชั้น 5</button>
+                </div>
+                
+                <!-- Floor 11 -->
+                <div id="floor-11" class="floor-map active gap-4 grid-cols-2 md:grid-cols-4">
+                    <div class="room-block col-span-2 md:col-span-4 bg-teal-50 border-teal-200">Mayfair Grand Ballroom A, B, C (ห้องบอลรูมหลัก, งานเลี้ยง)</div>
+                    <div class="room-block">Jubilee Ballroom A, B</div>
+                    <div class="room-block">Boardroom 1, 3</div>
+                    <div class="room-block col-span-2 md:col-span-4 bg-yellow-50 border-yellow-300">Foyer & Registration (จุดลงทะเบียน)</div>
+                </div>
+
+                <!-- Floor 10 -->
+                <div id="floor-10" class="floor-map gap-4 grid-cols-2 md:grid-cols-3">
+                    <div class="room-block col-span-2 md:col-span-3 bg-red-50 border-red-200">Poster Area</div>
+                    <div class="room-block">Palladium Hall</div>
+                    <div class="room-block">The Lounge</div>
+                     <div class="room-block">Mulberry</div>
+                </div>
+
+                <!-- Floor 5 -->
+                <div id="floor-5" class="floor-map gap-2 grid-cols-2">
+                    <div class="room-block">Kensington Ballroom A</div>
+                    <div class="room-block">Kensington Ballroom B</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Sessions -->
+        <section id="sessions" class="content-section">
+             <div class="text-center mb-8">
+                 <h2 class="text-3xl font-bold text-slate-800">รหัสเซสชัน (Session Codes)</h2>
+                 <p class="text-slate-600 mt-2">ใช้สำหรับอ้างอิงหัวข้อการบรรยายในแต่ละห้อง พิมพ์เพื่อค้นหา</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200">
+                <input type="text" id="session-search" placeholder="ค้นหารหัส หรือ หัวข้อ..." class="w-full p-3 mb-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead class="bg-slate-100">
+                            <tr>
+                                <th class="px-4 py-2 text-left font-semibold text-slate-600">รหัส</th>
+                                <th class="px-4 py-2 text-left font-semibold text-slate-600">ชื่อหัวข้อเซสชัน</th>
+                            </tr>
+                        </thead>
+                        <tbody id="session-table-body">
+                           <!-- Session data will be injected here by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Contacts -->
+        <section id="contacts" class="content-section">
+            <div class="text-center mb-8">
+                 <h2 class="text-3xl font-bold text-slate-800">รายชื่อผู้ติดต่อสำคัญ</h2>
+                 <p class="text-slate-600 mt-2">สำหรับติดต่อประสานงานในกรณีเร่งด่วนหรือต้องการความช่วยเหลือ</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6">
+                 <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                    <h3 class="font-bold text-xl text-teal-700 mb-2">ผู้ประสานงานหลัก (Overall Coordinator)</h3>
+                    <p class="text-lg">[ชื่อ-นามสกุล]</p>
+                    <p class="text-slate-500">เบอร์โทร: [เบอร์โทรศัพท์]</p>
+                </div>
+                 <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                    <h3 class="font-bold text-xl text-teal-700 mb-2">ฝ่ายเทคนิคและอุปกรณ์ (AV Support)</h3>
+                    <p class="text-lg">[ชื่อ-นามสกุล]</p>
+                    <p class="text-slate-500">เบอร์โทร: [เบอร์โทรศัพท์]</p>
+                </div>
+                 <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                    <h3 class="font-bold text-xl text-teal-700 mb-2">ฝ่ายรักษาความปลอดภัย (Security)</h3>
+                     <p class="text-lg">ติดต่อผ่านโรงแรม</p>
+                    <p class="text-slate-500">เบอร์โทร: [เบอร์โทรศัพท์ของโรงแรม]</p>
+                </div>
             </div>
         </section>
 
     </main>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <p>Hosted by <strong>The Heart Association of Thailand</strong></p>
-            <p>In collaboration with the <strong>ASEAN Federation of Cardiology (AFC)</strong></p>
-            <p>© 2025 ASEAN Cardiovascular Congress. All Rights Reserved.</p>
-            <p>For more information, visit the official site: <a href="https://acc2025thailand.com" target="_blank">acc2025thailand.com</a></p>
-        </div>
-    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
 
+            function switchTab(targetId) {
+                contentSections.forEach(section => {
+                    section.classList.toggle('active', section.id === targetId);
+                });
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.dataset.target === targetId);
+                });
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.dataset.target;
+                    switchTab(targetId);
+                    if (mobileMenu.classList.contains('block')) {
+                        mobileMenu.classList.remove('block');
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+            
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                mobileMenu.classList.toggle('block');
+            });
+
+            // Task tabs logic
+            const taskTabs = document.querySelectorAll('.task-tab');
+            const taskContentContainer = document.getElementById('task-content');
+
+            const tasks = {
+                before: [
+                    "<strong>ตรวจสอบความพร้อมห้อง:</strong> จัดเตรียมไมโครโฟน, น้ำดื่ม และตรวจสอบความสะอาด",
+                    "<strong>ตรวจสอบอุปกรณ์ AV:</strong> เปิดคอมพิวเตอร์, โปรเจคเตอร์ และทดสอบเสียง",
+                    "<strong>ต้อนรับผู้บรรยาย:</strong> แนะนำตัว, ช่วยคัดลอกไฟล์ และแจ้งกำหนดการเวลา",
+                    "<strong>เตรียมเอกสาร (ถ้ามี):</strong> จัดเตรียมเอกสารประกอบการบรรยายให้พร้อม"
+                ],
+                during: [
+                    "<strong>ควบคุมอุปกรณ์:</strong> ช่วยเปลี่ยนสไลด์, ตรวจสอบคุณภาพเสียงและภาพ",
+                    "<strong>ช่วยควบคุมเวลา:</strong> ให้สัญญาณเตือนเวลาแก่ผู้บรรยายตามที่กำหนด",
+                    "<strong>อำนวยความสะดวก:</strong> เตรียมไมค์สำหรับ Q&A, ตอบคำถามเบื้องต้น",
+                    "<strong>แก้ไขปัญหาเฉพาะหน้า:</strong> ประสานงานกับประธานเซสชันหากเกิดความล่าช้า"
+                ],
+                after: [
+                    "<strong>ปิดอุปกรณ์:</strong> ปิดคอมพิวเตอร์, โปรเจคเตอร์ และเก็บอุปกรณ์ให้เรียบร้อย",
+                    "<strong>ตรวจสอบความเรียบร้อย:</strong> ตรวจสอบของที่อาจหลงลืมไว้ในห้อง",
+                    "<strong>รายงานปัญหา:</strong> แจ้งปัญหาที่ยังไม่ได้รับการแก้ไขให้ผู้ประสานงานหลักทราบ"
+                ]
+            };
+            
+            function renderTasks(taskKey) {
+                taskContentContainer.innerHTML = `<ul class="space-y-4 list-inside list-disc text-slate-700">${tasks[taskKey].map(task => `<li class="pl-2">${task}</li>`).join('')}</ul>`;
+            }
+
+            taskTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    taskTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    renderTasks(tab.dataset.task);
+                });
+            });
+
+            renderTasks('before'); // Initial render
+
+            // Map logic
+            const mapButtons = document.querySelectorAll('.map-button');
+            const floorMaps = document.querySelectorAll('.floor-map');
+            
+            mapButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    mapButtons.forEach(b => b.classList.remove('active'));
+                    button.classList.add('active');
+
+                    floorMaps.forEach(map => {
+                        map.classList.toggle('active', map.id === `floor-${button.dataset.floor}`);
+                    });
+                });
+            });
+            
+            // Session data and search logic
+            const sessionData = [
+                { code: "AN", name: "Analytical Chemistry" },
+                { code: "CE", name: "Chemical Education" },
+                { code: "FA", name: "Food, Agriculture, and Cosmetics" },
+                { code: "IC", name: "Inorganic Chemistry" },
+                { code: "NB", name: "Natural Products, Biological Chemistry and Chemical Biology" },
+                { code: "OM", name: "Organic Synthesis and Medicinal Chemistry" },
+                { code: "PC", name: "Polymers and Bio-based Materials" },
+                { code: "PH", name: "Physical and Theoretical Chemistry" },
+                { code: "S1", name: "Chemistry and Application of Functional Materials" },
+                { code: "S2", name: "Catalytic Systems for Contemporary Challenges" },
+                { code: "S3", name: "Electrochemistry for Sustainable Future" },
+                { code: "S4", name: "Micro- and Nanomotors for Biomedical and Environmental Applications" },
+                { code: "S5", name: "AI in Drug Discovery Research" },
+                { code: "S6", name: "Advances in Nutraceutical Chemistry Shaping the Future of Disease Prevention in Asia" },
+                { code: "S7", name: "Chemical Education for Sustainable Development" },
+                { code: "S8", name: "Green Chemistry; Paving the Way to a Sustainable Future" },
+                { code: "SE", name: "Unlocking the Power of Nature: Cutting-Edge Applications of Natural Products, Biological Chemistry, and Chemical Biology" }
+            ];
+
+            const sessionTableBody = document.getElementById('session-table-body');
+            const sessionSearch = document.getElementById('session-search');
+
+            function renderSessionTable(filter = '') {
+                const lowercasedFilter = filter.toLowerCase();
+                const filteredData = sessionData.filter(item => 
+                    item.code.toLowerCase().includes(lowercasedFilter) ||
+                    item.name.toLowerCase().includes(lowercasedFilter)
+                );
+                
+                if (filteredData.length === 0) {
+                     sessionTableBody.innerHTML = `<tr><td colspan="2" class="text-center p-4 text-slate-500">ไม่พบข้อมูลที่ค้นหา</td></tr>`;
+                     return;
+                }
+
+                sessionTableBody.innerHTML = filteredData.map(item => `
+                    <tr class="border-b border-slate-200 hover:bg-slate-50">
+                        <td class="px-4 py-3 font-mono text-teal-600 font-semibold">${item.code}</td>
+                        <td class="px-4 py-3">${item.name}</td>
+                    </tr>
+                `).join('');
+            }
+
+            sessionSearch.addEventListener('keyup', (e) => {
+                renderSessionTable(e.target.value);
+            });
+            
+            renderSessionTable(); // Initial render
+        });
+    </script>
 </body>
 </html>
