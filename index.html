@@ -151,23 +151,25 @@
                 <div id="floor-11" class="floor-map active gap-4 grid-cols-2 md:grid-cols-4">
                     <div class="room-block col-span-2 md:col-span-4 bg-teal-50 border-teal-200">Mayfair Grand Ballroom A, B, C (ห้องบอลรูมหลัก, งานเลี้ยง)</div>
                     <div class="room-block">Jubilee Ballroom A, B</div>
-                    <div class="room-block">Boardroom 1, 3</div>
+                    <div class="room-block">Boardroom 1, 3</div>                    
                     <div class="room-block col-span-2 md:col-span-4 bg-yellow-50 border-yellow-300">Foyer & Registration (จุดลงทะเบียน)</div>
-                    
+                    <div class="room-block col-span-2 md:col-span-3 bg-red-50 border-red-200">Poster Area</div>
+                    <div class="room-block col-span-2 md:col-span-4 bg-teal-50 border-teal-200"><img src="https://acc2025thailand.com/media/venue/11-Fl_0.png" alt="floor-11" class="block mx-auto"></div>
                 </div>
 
                 <!-- Floor 10 -->
                 <div id="floor-10" class="floor-map gap-4 grid-cols-2 md:grid-cols-3">
-                    <div class="room-block col-span-2 md:col-span-3 bg-red-50 border-red-200">Poster Area</div>
                     <div class="room-block">Palladium Hall</div>
                     <div class="room-block">The Lounge</div>
-                     <div class="room-block">Mulberry</div>
+                    <div class="room-block">Mulberry</div>
+                    <div class="room-block col-span-2 md:col-span-4 bg-teal-50 border-teal-200"><img src="https://acc2025thailand.com/media/venue/10-Fl_0.png" alt="floor-10" width="75%" class="block mx-auto"></div>
                 </div>
 
                 <!-- Floor 5 -->
                 <div id="floor-5" class="floor-map gap-2 grid-cols-2">
                     <div class="room-block">Kensington Ballroom A</div>
                     <div class="room-block">Kensington Ballroom B</div>
+                    <div class="room-block col-span-2 md:col-span-4 bg-teal-50 border-teal-200"><img src="https://acc2025thailand.com/media/venue/5-Fl_0.png" alt="floor-5" class="block mx-auto"></div>
                 </div>
             </div>
         </section>
@@ -262,8 +264,7 @@
 
             const tasks = {
                 before: [
-                    "<strong>ตรวจสอบความพร้อมห้อง:</strong> จัดเตรียมไมโครโฟน, น้ำดื่ม และตรวจสอบความสะอาด",
-                    "<strong>ตรวจสอบอุปกรณ์ AV:</strong> เปิดคอมพิวเตอร์, โปรเจคเตอร์ และทดสอบเสียง",
+                    "<strong>ตรวจสอบความพร้อมห้อง:</strong> จัดเตรียมไมโครโฟน, เปิดคอมพิวเตอร์, โปรเจคเตอร์ และทดสอบเสียง",
                     "<strong>ต้อนรับผู้บรรยาย:</strong> แนะนำตัว, ช่วยคัดลอกไฟล์ และแจ้งกำหนดการเวลา",
                     "<strong>เตรียมเอกสาร (ถ้ามี):</strong> จัดเตรียมเอกสารประกอบการบรรยายให้พร้อม"
                 ],
@@ -311,23 +312,33 @@
             
             // Session data and search logic
             const sessionData = [
-                { code: "AN", name: "Analytical Chemistry" },
-                { code: "CE", name: "Chemical Education" },
+                { code: "AC", name: "Analytical Chemistry" },
+                { code: "CE", name: "Chemistry for Energy and Environment" },
                 { code: "FA", name: "Food, Agriculture, and Cosmetics" },
+                { code: "FE", name: "Future in Chemical Education" },
+                { code: "IE", name: "Industrial and Engineering Chemistry" },
                 { code: "IC", name: "Inorganic Chemistry" },
+                { code: "MN", name: "Materials Science and Nanotechnology" },
                 { code: "NB", name: "Natural Products, Biological Chemistry and Chemical Biology" },
                 { code: "OM", name: "Organic Synthesis and Medicinal Chemistry" },
+                { code: "PT", name: "Physical and Theoretical Chemistry" },
                 { code: "PC", name: "Polymers and Bio-based Materials" },
-                { code: "PH", name: "Physical and Theoretical Chemistry" },
-                { code: "S1", name: "Chemistry and Application of Functional Materials" },
+                { code: "SS", name: "Science Projects for Students Showcase" },
+                { code: "US", name: "Future Chemistry Research Presentation for Undergraduate Students" },
+                { code: "S1", name: "Thailand-Japan Bilateral Symposium: Advancing Synchrotron Science through Experimental and Computational Chemistry Synergy" },
                 { code: "S2", name: "Catalytic Systems for Contemporary Challenges" },
-                { code: "S3", name: "Electrochemistry for Sustainable Future" },
-                { code: "S4", name: "Micro- and Nanomotors for Biomedical and Environmental Applications" },
+                { code: "S3", name: "Advanced Coordination Materials and Catalysis for Environment" },
+                { code: "S4", name: "Understanding and Development to Address the PFAS Problems in Thailand for Sustainable Environment" },
                 { code: "S5", name: "AI in Drug Discovery Research" },
                 { code: "S6", name: "Advances in Nutraceutical Chemistry Shaping the Future of Disease Prevention in Asia" },
-                { code: "S7", name: "Chemical Education for Sustainable Development" },
                 { code: "S8", name: "Green Chemistry; Paving the Way to a Sustainable Future" },
-                { code: "SE", name: "Unlocking the Power of Nature: Cutting-Edge Applications of Natural Products, Biological Chemistry, and Chemical Biology" }
+                { code: "S9", name: "Ryoji Noyori ACES Awards Symposium" },
+                { code: "SA", name: "Young Career Development under FACS-ACS Collaboration" },
+                { code: "SB", name: "TU-Frontier Lab-JEOL joint session Contaminants of Emerging Concern: PFAS & Microplastics" },
+                { code: "SC", name: "Sustainable chemistry Focusing on Clean energy Good Health and Well-Being (Thailand-Taiwan)" },
+                { code: "SD", name: "IMS-CU Bilateral Symposium for Driving Forward Frontier Research" },
+                { code: "SE", name: "Unlocking the Power of Nature: Cutting-Edge Applications of Natural Products, Biological Chemistry, and Chemical Biology" },
+                { code: "SG", name: "Sustainable Chemistry for Agricultural Residue Valorization" }
             ];
 
             const sessionTableBody = document.getElementById('session-table-body');
